@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <title>Panel Alumno</title>
+</head>
+<body>
+<nav>
+  <span class="marca">Gestión de Prácticas</span>
+  <div>
+    <a th:href="@{/alumno/horas}">Mis Horas</a>
+    <a th:href="@{/alumno/evaluaciones}">Mis Evaluaciones</a>
+    <a th:href="@{/logout}">Cerrar sesión</a>
+  </div>
+</nav>
+<div class="contenido">
+  <h1 class="panel-titulo">Panel de Alumno</h1>
+  <p class="bienvenida" th:text="'Bienvenido/a, ' + ${usuario.nombre}"></p>
+  <div class="botones-panel">
+    <a th:href="@{/alumno/horas}" class="btn-panel">Registrar Horas</a>
+    <a th:href="@{/alumno/evaluaciones}" class="btn-panel">Ver Evaluaciones</a>
+    <a th:href="@{/logout}" class="btn-panel btn-rojo">Cerrar sesión</a>
+  </div>
+</div>
+</body>
+</html>

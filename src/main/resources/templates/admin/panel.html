@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Panel Administrador</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/empresas}">Empresas</a>
+        <a th:href="@{/admin/practicas}">Prácticas</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Panel de Administrador</h1>
+    <p class="bienvenida" th:text="'Bienvenido/a, ' + ${usuario.nombre}"></p>
+    <div class="botones-panel">
+        <a th:href="@{/admin/usuarios}" class="btn-panel">Gestionar Usuarios</a>
+        <a th:href="@{/admin/empresas}" class="btn-panel">Gestionar Empresas</a>
+        <a th:href="@{/admin/practicas}" class="btn-panel">Asignar Prácticas</a>
+        <a th:href="@{/logout}" class="btn-panel btn-rojo">Cerrar sesión</a>
+    </div>
+</div>
+</body>
+</html>
