@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -38,10 +39,12 @@ public class AlumnoControlador {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
         alumno.ifPresent(a -> {
-            practicaServicio.buscarPorAlumno(a).ifPresent(p -> {
+            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
+            if (!practicas.isEmpty()) {
+                Practica p = practicas.get(0);
                 model.addAttribute("practica", p);
                 model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(p));
-            });
+            }
         });
         model.addAttribute("nuevoSeguimiento", new Seguimiento());
         return "alumno/horas";
@@ -66,9 +69,10 @@ public class AlumnoControlador {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
         alumno.ifPresent(a -> {
-            practicaServicio.buscarPorAlumno(a).ifPresent(p -> {
-                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(p));
-            });
+            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
+            if (!practicas.isEmpty()) {
+                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(practicas.get(0)));
+            }
         });
         return "alumno/evaluaciones";
     }

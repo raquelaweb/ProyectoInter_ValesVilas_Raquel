@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Gestión de Usuarios</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/admin/panel}">Panel</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/empresas}">Empresas</a>
+        <a th:href="@{/admin/practicas}">Prácticas</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Gestión de Usuarios</h1>
+
+    <!-- FORMULARIO AÑADIR -->
+    <div class="formulario">
+        <form th:action="@{/admin/usuarios/guardar}" th:object="${nuevoUsuario}" method="post">
+            <div class="formulario-fila">
+                <input type="text" th:field="*{nombre}" placeholder="Nombre" required/>
+                <input type="email" th:field="*{email}" placeholder="Email" required/>
+                <input type="password" th:field="*{password}" placeholder="Contraseña" required/>
+                <select th:field="*{rol}">
+                    <option value="">-- Rol --</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="TUTOR_CENTRO">Tutor Centro</option>
+                    <option value="TUTOR_EMPRESA">Tutor Empresa</option>
+                    <option value="ALUMNO">Alumno</option>
+                </select>
+                <button type="submit" class="btn-panel btn-verde">Añadir</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="usuario : ${usuarios}">
+            <td th:text="${usuario.id}"></td>
+            <td th:text="${usuario.nombre}"></td>
+            <td th:text="${usuario.email}"></td>
+            <td th:text="${usuario.rol}"></td>
+            <td>
+                <a th:href="@{/admin/usuarios/eliminar/{id}(id=${usuario.id})}"
+                   class="btn-panel btn-rojo"
+                   onclick="return confirm('¿Seguro que quieres eliminar este usuario?')">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

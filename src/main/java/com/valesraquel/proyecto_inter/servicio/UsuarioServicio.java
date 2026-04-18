@@ -1,7 +1,13 @@
 package com.valesraquel.proyecto_inter.servicio;
 
+import java.util.List;
 import com.valesraquel.proyecto_inter.modelo.Usuario;
+import com.valesraquel.proyecto_inter.repositorio.AlumnoRepositorio;
+import com.valesraquel.proyecto_inter.repositorio.PracticaRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.UsuarioRepositorio;
+import com.valesraquel.proyecto_inter.modelo.Practica;
+import com.valesraquel.proyecto_inter.repositorio.EvaluacionRepositorio;
+import com.valesraquel.proyecto_inter.repositorio.SeguimientoRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -9,8 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +22,18 @@ public class UsuarioServicio implements UserDetailsService {
 
     @Autowired
     private UsuarioRepositorio repositorio;
+
+    @Autowired
+    private PracticaRepositorio practicaRepositorio;
+
+    @Autowired
+    private AlumnoRepositorio alumnoRepositorio;
+
+    @Autowired
+    private EvaluacionRepositorio evaluacionRepositorio;
+
+    @Autowired
+    private SeguimientoRepositorio seguimientoRepositorio;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -48,6 +64,14 @@ public class UsuarioServicio implements UserDetailsService {
     }
 
     public void eliminar(Integer id) {
+        alumnoRepositorio.findById(id).ifPresent(alumno -> {
+            List<Practica> practicas = practicaRepositorio.findByAlumno(alumno);
+            practicas.forEach(p -> {
+                evaluacionRepositorio.deleteAll(evaluacionRepositorio.findByPractica(p));
+                seguimientoRepositorio.deleteAll(seguimientoRepositorio.findByPractica(p));
+            });
+            practicaRepositorio.deleteAll((Iterable<? extends Practica>) practicas);
+        });
         repositorio.deleteById(id);
     }
 }

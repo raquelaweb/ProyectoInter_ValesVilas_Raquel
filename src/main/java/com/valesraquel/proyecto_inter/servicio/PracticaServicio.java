@@ -5,6 +5,7 @@ import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.repositorio.PracticaRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ public class PracticaServicio {
         return repositorio.findAll();
     }
 
-    public Optional<Practica> buscarPorAlumno(Alumno alumno) {
+    public List<Practica> buscarPorAlumno(Alumno alumno) {
         return repositorio.findByAlumno(alumno);
     }
 
