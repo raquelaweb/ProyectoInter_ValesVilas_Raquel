@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Error</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo" style="color: #f44336;">Ha ocurrido un error</h1>
+    <p class="bienvenida" th:text="${mensaje}">Error desconocido.</p>
+    <a href="/login" class="btn-panel" style="max-width:200px; margin-top:20px;">Volver al inicio</a>
+</div>
+</body>
+</html>

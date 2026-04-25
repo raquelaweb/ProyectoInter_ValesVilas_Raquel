@@ -11,9 +11,11 @@ import com.valesraquel.proyecto_inter.servicio.PracticaServicio;
 import com.valesraquel.proyecto_inter.repositorio.TutorRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.AlumnoRepositorio;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,7 +48,12 @@ public class AdminControlador {
     }
 
     @PostMapping("/usuarios/guardar")
-    public String guardarUsuario(@ModelAttribute Usuario usuario) {
+    public String guardarUsuario(@Valid @ModelAttribute("nuevoUsuario") Usuario usuario,
+                                 BindingResult resultado, Model model, HttpSession session) {
+        if (resultado.hasErrors()) {
+            model.addAttribute("usuarios", usuarioServicio.listarTodos());
+            return "admin/usuarios";
+        }
         usuarioServicio.guardar(usuario);
         return "redirect:/admin/usuarios";
     }
@@ -67,7 +74,12 @@ public class AdminControlador {
     }
 
     @PostMapping("/empresas/guardar")
-    public String guardarEmpresa(@ModelAttribute Empresa empresa) {
+    public String guardarEmpresa(@Valid @ModelAttribute("nuevaEmpresa") Empresa empresa,
+                                 BindingResult resultado, Model model, HttpSession session) {
+        if (resultado.hasErrors()) {
+            model.addAttribute("empresas", empresaServicio.listarTodas());
+            return "admin/empresas";
+        }
         empresaServicio.guardar(empresa);
         return "redirect:/admin/empresas";
     }

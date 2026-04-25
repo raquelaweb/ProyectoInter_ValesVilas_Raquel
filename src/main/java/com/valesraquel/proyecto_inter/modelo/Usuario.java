@@ -1,6 +1,8 @@
 package com.valesraquel.proyecto_inter.modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "usuario")
@@ -11,11 +13,15 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    @Email(message = "El email no es válido")
+    @NotBlank(message = "El email es obligatorio")
     @Column(unique = true)
     private String email;
 
+    @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     @Enumerated(EnumType.STRING)

@@ -1,6 +1,7 @@
 package com.valesraquel.proyecto_inter.modelo;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "empresa")
@@ -10,8 +11,10 @@ public class Empresa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    @NotBlank(message = "El CIF es obligatorio")
     @Column(unique = true)
     private String cif;
 
