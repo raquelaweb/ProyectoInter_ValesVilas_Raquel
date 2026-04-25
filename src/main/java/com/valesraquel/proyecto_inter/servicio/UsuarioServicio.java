@@ -2,13 +2,18 @@ package com.valesraquel.proyecto_inter.servicio;
 
 import java.util.List;
 import com.valesraquel.proyecto_inter.modelo.Usuario;
+import com.valesraquel.proyecto_inter.modelo.Alumno;
+import com.valesraquel.proyecto_inter.modelo.Tutor;
+import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.repositorio.AlumnoRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.PracticaRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.UsuarioRepositorio;
-import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.repositorio.EvaluacionRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.SeguimientoRepositorio;
+import com.valesraquel.proyecto_inter.repositorio.TutorRepositorio;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,10 +36,16 @@ public class UsuarioServicio implements UserDetailsService {
     private AlumnoRepositorio alumnoRepositorio;
 
     @Autowired
+    private TutorRepositorio tutorRepositorio;
+
+    @Autowired
     private EvaluacionRepositorio evaluacionRepositorio;
 
     @Autowired
     private SeguimientoRepositorio seguimientoRepositorio;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     // Spring Security usa este método para cargar el usuario al hacer login
     @Override
@@ -64,9 +75,28 @@ public class UsuarioServicio implements UserDetailsService {
         return repositorio.findById(id);
     }
 
-    // Guarda o actualiza un usuario
+    // Guarda un usuario y crea su registro específico según el rol usando SQL directo
+    // para evitar conflictos de caché con Hibernate
+    @Transactional
     public Usuario guardar(Usuario usuario) {
-        return repositorio.save(usuario);
+        Usuario guardado = repositorio.save(usuario);
+        repositorio.flush();
+
+        if (usuario.getRol() == Usuario.Rol.ALUMNO) {
+            if (!alumnoRepositorio.existsById(guardado.getId())) {
+                jdbcTemplate.update("INSERT INTO alumno (id) VALUES (?)", guardado.getId());
+            }
+        } else if (usuario.getRol() == Usuario.Rol.TUTOR_EMPRESA) {
+            if (!tutorRepositorio.existsById(guardado.getId())) {
+                jdbcTemplate.update("INSERT INTO tutor (id, tipo) VALUES (?, 'EMPRESA')", guardado.getId());
+            }
+        } else if (usuario.getRol() == Usuario.Rol.TUTOR_CENTRO) {
+            if (!tutorRepositorio.existsById(guardado.getId())) {
+                jdbcTemplate.update("INSERT INTO tutor (id, tipo) VALUES (?, 'CENTRO')", guardado.getId());
+            }
+        }
+
+        return guardado;
     }
 
     // Elimina un usuario y todos sus datos asociados para no romper las foreign keys
