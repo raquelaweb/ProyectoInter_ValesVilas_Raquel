@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Controlador que gestiona todas las funcionalidades del administrador
 @Controller
 @RequestMapping("/admin")
 public class AdminControlador {
@@ -30,7 +31,7 @@ public class AdminControlador {
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private AlumnoRepositorio alumnoRepositorio;
 
-    // PANEL PRINCIPAL
+    // Muestra el panel principal del admin
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -38,7 +39,7 @@ public class AdminControlador {
         return "admin/panel";
     }
 
-    // GESTIÓN DE USUARIOS
+    // Muestra la lista de usuarios
     @GetMapping("/usuarios")
     public String listarUsuarios(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -47,6 +48,7 @@ public class AdminControlador {
         return "admin/usuarios";
     }
 
+    // Guarda un nuevo usuario validando los campos del formulario
     @PostMapping("/usuarios/guardar")
     public String guardarUsuario(@Valid @ModelAttribute("nuevoUsuario") Usuario usuario,
                                  BindingResult resultado, Model model, HttpSession session) {
@@ -58,13 +60,14 @@ public class AdminControlador {
         return "redirect:/admin/usuarios";
     }
 
+    // Elimina un usuario y todos sus datos asociados
     @GetMapping("/usuarios/eliminar/{id}")
     public String eliminarUsuario(@PathVariable Integer id) {
         usuarioServicio.eliminar(id);
         return "redirect:/admin/usuarios";
     }
 
-    // GESTIÓN DE EMPRESAS
+    // Muestra la lista de empresas
     @GetMapping("/empresas")
     public String listarEmpresas(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -73,6 +76,7 @@ public class AdminControlador {
         return "admin/empresas";
     }
 
+    // Guarda una nueva empresa validando los campos del formulario
     @PostMapping("/empresas/guardar")
     public String guardarEmpresa(@Valid @ModelAttribute("nuevaEmpresa") Empresa empresa,
                                  BindingResult resultado, Model model, HttpSession session) {
@@ -84,13 +88,14 @@ public class AdminControlador {
         return "redirect:/admin/empresas";
     }
 
+    // Elimina una empresa por su id
     @GetMapping("/empresas/eliminar/{id}")
     public String eliminarEmpresa(@PathVariable Integer id) {
         empresaServicio.eliminar(id);
         return "redirect:/admin/empresas";
     }
 
-    // ASIGNAR PRÁCTICAS
+    // Muestra la pantalla de asignación de prácticas con todos los desplegables necesarios
     @GetMapping("/practicas")
     public String listarPracticas(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -103,6 +108,7 @@ public class AdminControlador {
         return "admin/practicas";
     }
 
+    // Crea una nueva práctica asignando alumno, empresa y tutores
     @PostMapping("/practicas/guardar")
     public String guardarPractica(@RequestParam Integer alumnoId,
                                   @RequestParam Integer empresaId,

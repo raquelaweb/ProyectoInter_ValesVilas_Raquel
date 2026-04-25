@@ -3,6 +3,7 @@ package com.valesraquel.proyecto_inter.modelo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+// Clase que representa una empresa colaboradora donde los alumnos hacen las prácticas
 @Entity
 @Table(name = "empresa")
 public class Empresa {
@@ -14,6 +15,7 @@ public class Empresa {
     @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
 
+    // El CIF identifica a la empresa de forma única
     @NotBlank(message = "El CIF es obligatorio")
     @Column(unique = true)
     private String cif;
@@ -22,6 +24,7 @@ public class Empresa {
     private String contacto;
     private String email;
 
+    // Getters y setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getNombre() { return nombre; }

@@ -2,6 +2,7 @@ package com.valesraquel.proyecto_inter.modelo;
 
 import jakarta.persistence.*;
 
+// Evaluación que el tutor de empresa hace sobre el alumno al finalizar las prácticas
 @Entity
 @Table(name = "evaluacion")
 public class Evaluacion {
@@ -10,10 +11,12 @@ public class Evaluacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // Práctica que se está evaluando
     @ManyToOne
     @JoinColumn(name = "practica_id")
     private Practica practica;
 
+    // Tutor que realiza la evaluación
     @ManyToOne
     @JoinColumn(name = "tutor_id")
     private Tutor tutor;
@@ -21,6 +24,7 @@ public class Evaluacion {
     private Float nota;
     private String comentarios;
 
+    // Getters y setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public Practica getPractica() { return practica; }

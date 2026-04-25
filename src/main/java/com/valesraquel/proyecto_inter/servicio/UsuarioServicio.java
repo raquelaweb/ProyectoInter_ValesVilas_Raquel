@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
+// Servicio principal de usuarios, también implementa UserDetailsService para Spring Security
 @Service
 public class UsuarioServicio implements UserDetailsService {
 
@@ -35,6 +36,7 @@ public class UsuarioServicio implements UserDetailsService {
     @Autowired
     private SeguimientoRepositorio seguimientoRepositorio;
 
+    // Spring Security usa este método para cargar el usuario al hacer login
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = repositorio.findByEmail(email)
@@ -47,22 +49,27 @@ public class UsuarioServicio implements UserDetailsService {
         );
     }
 
+    // Busca un usuario por su email
     public Optional<Usuario> buscarPorEmail(String email) {
         return repositorio.findByEmail(email);
     }
 
+    // Devuelve todos los usuarios
     public List<Usuario> listarTodos() {
         return repositorio.findAll();
     }
 
+    // Busca un usuario por su id
     public Optional<Usuario> buscarPorId(Integer id) {
         return repositorio.findById(id);
     }
 
+    // Guarda o actualiza un usuario
     public Usuario guardar(Usuario usuario) {
         return repositorio.save(usuario);
     }
 
+    // Elimina un usuario y todos sus datos asociados para no romper las foreign keys
     public void eliminar(Integer id) {
         alumnoRepositorio.findById(id).ifPresent(alumno -> {
             List<Practica> practicas = practicaRepositorio.findByAlumno(alumno);

@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+// Configuración de seguridad de la aplicación con Spring Security
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -19,11 +20,13 @@ public class SecurityConfig {
     @Autowired
     private UsuarioServicio usuarioServicio;
 
+    // Usamos NoOpPasswordEncoder porque las contraseñas están en texto plano en la BD
     @Bean
     public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
     }
 
+    // Define qué rutas son accesibles para cada rol
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -52,6 +55,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configura el AuthenticationManager para que use nuestro servicio de usuarios
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder builder =

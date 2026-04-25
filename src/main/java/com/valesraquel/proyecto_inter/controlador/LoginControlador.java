@@ -10,12 +10,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+// Controlador que gestiona el login y la redirección según el rol del usuario
 @Controller
 public class LoginControlador {
 
     @Autowired
     private UsuarioServicio usuarioServicio;
 
+    // Muestra la página de login, con mensaje de error si los datos son incorrectos
     @GetMapping("/login")
     public String mostrarLogin(@RequestParam(required = false) String error, Model model) {
         if (error != null) {
@@ -24,6 +26,7 @@ public class LoginControlador {
         return "login";
     }
 
+    // Redirige al panel correspondiente según el rol del usuario que ha iniciado sesión
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth, HttpSession session) {
         String email = auth.getName();
@@ -39,6 +42,7 @@ public class LoginControlador {
         };
     }
 
+    // Redirige la raíz al login
     @GetMapping("/")
     public String inicio() {
         return "redirect:/login";

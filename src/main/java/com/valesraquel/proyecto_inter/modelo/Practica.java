@@ -3,6 +3,8 @@ package com.valesraquel.proyecto_inter.modelo;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+// Clase que representa una práctica en empresa asignada a un alumno
+// Relaciona al alumno con la empresa y los dos tutores
 @Entity
 @Table(name = "practica")
 public class Practica {
@@ -11,18 +13,22 @@ public class Practica {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // Alumno que realiza la práctica
     @ManyToOne
     @JoinColumn(name = "alumno_id")
     private Alumno alumno;
 
+    // Empresa donde se realiza la práctica
     @ManyToOne
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;
 
+    // Tutor de la empresa que supervisa al alumno en el puesto
     @ManyToOne
     @JoinColumn(name = "tutor_empresa_id")
     private Tutor tutorEmpresa;
 
+    // Tutor del centro educativo que hace el seguimiento
     @ManyToOne
     @JoinColumn(name = "tutor_centro_id")
     private Tutor tutorCentro;
@@ -30,6 +36,7 @@ public class Practica {
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
 
+    // Estado actual de la práctica
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
@@ -37,6 +44,7 @@ public class Practica {
         PENDIENTE, ACTIVA, FINALIZADA
     }
 
+    // Getters y setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public Alumno getAlumno() { return alumno; }

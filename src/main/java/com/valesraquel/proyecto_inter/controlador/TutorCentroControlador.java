@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+// Controlador que gestiona las funcionalidades del tutor de centro
 @Controller
 @RequestMapping("/tutorcentro")
 public class TutorCentroControlador {
@@ -25,6 +26,7 @@ public class TutorCentroControlador {
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private PracticaRepositorio practicaRepositorio;
 
+    // Muestra el panel principal del tutor de centro
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -32,6 +34,7 @@ public class TutorCentroControlador {
         return "tutorcentro/panel";
     }
 
+    // Muestra las prácticas asignadas al tutor de centro con su seguimiento y evaluaciones
     @GetMapping("/practicas")
     public String supervisarPracticas(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";

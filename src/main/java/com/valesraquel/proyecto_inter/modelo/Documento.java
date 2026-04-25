@@ -3,6 +3,7 @@ package com.valesraquel.proyecto_inter.modelo;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
+// Clase para gestionar los documentos subidos relacionados con una práctica
 @Entity
 @Table(name = "documento")
 public class Documento {
@@ -11,18 +12,23 @@ public class Documento {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // Práctica a la que pertenece el documento
     @ManyToOne
     @JoinColumn(name = "practica_id")
     private Practica practica;
 
     private String tipo;
+
+    // Ruta donde está guardado el archivo en el servidor
     private String ruta;
     private LocalDate fechaSubida;
 
+    // Usuario que subió el documento
     @ManyToOne
     @JoinColumn(name = "subido_por")
     private Usuario subidoPor;
 
+    // Getters y setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public Practica getPractica() { return practica; }

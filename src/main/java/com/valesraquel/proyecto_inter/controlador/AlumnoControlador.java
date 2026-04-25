@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+// Controlador que gestiona las funcionalidades del alumno
 @Controller
 @RequestMapping("/alumno")
 public class AlumnoControlador {
@@ -26,6 +27,7 @@ public class AlumnoControlador {
     @Autowired private EvaluacionServicio evaluacionServicio;
     @Autowired private AlumnoRepositorio alumnoRepositorio;
 
+    // Muestra el panel principal del alumno
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -33,6 +35,7 @@ public class AlumnoControlador {
         return "alumno/panel";
     }
 
+    // Muestra las horas registradas y el formulario para añadir nuevas
     @GetMapping("/horas")
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -50,6 +53,7 @@ public class AlumnoControlador {
         return "alumno/horas";
     }
 
+    // Guarda un nuevo registro de horas
     @PostMapping("/horas/guardar")
     public String guardarHoras(@ModelAttribute Seguimiento seguimiento,
                                @RequestParam Integer practicaId,
@@ -63,6 +67,7 @@ public class AlumnoControlador {
         return "redirect:/alumno/horas";
     }
 
+    // Muestra las evaluaciones recibidas por el alumno
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";

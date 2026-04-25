@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+// Controlador que gestiona las funcionalidades del tutor de empresa
 @Controller
 @RequestMapping("/tutorempresa")
 public class TutorEmpresaControlador {
@@ -27,6 +28,7 @@ public class TutorEmpresaControlador {
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private PracticaRepositorio practicaRepositorio;
 
+    // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -34,6 +36,7 @@ public class TutorEmpresaControlador {
         return "tutorempresa/panel";
     }
 
+    // Muestra las horas registradas por el alumno para que el tutor pueda validarlas
     @GetMapping("/horas")
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -50,12 +53,14 @@ public class TutorEmpresaControlador {
         return "tutorempresa/horas";
     }
 
+    // Marca un registro de horas como validado
     @GetMapping("/horas/validar/{id}")
     public String validarHoras(@PathVariable Integer id) {
         seguimientoServicio.validar(id);
         return "redirect:/tutorempresa/horas";
     }
 
+    // Muestra las evaluaciones y el formulario para añadir una nueva
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -73,6 +78,7 @@ public class TutorEmpresaControlador {
         return "tutorempresa/evaluaciones";
     }
 
+    // Guarda una evaluación nueva del alumno
     @PostMapping("/evaluaciones/guardar")
     public String guardarEvaluacion(@ModelAttribute Evaluacion evaluacion,
                                     @RequestParam Integer practicaId,
