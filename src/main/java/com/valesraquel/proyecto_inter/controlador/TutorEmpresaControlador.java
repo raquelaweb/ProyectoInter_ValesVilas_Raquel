@@ -59,6 +59,7 @@ public class TutorEmpresaControlador {
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
+        model.addAttribute("usuario", session.getAttribute("usuario"));
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
         tutor.ifPresent(t -> {
