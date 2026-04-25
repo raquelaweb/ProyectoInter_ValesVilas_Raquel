@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Supervisar Prácticas</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/tutorcentro/panel}">Panel</a>
+        <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Supervisar Prácticas</h1>
+
+    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
+
+    <div th:if="${practica != null}">
+        <h2 class="panel-titulo" style="font-size:18px; margin-bottom:15px;">
+            Alumno: <span th:text="${practica.alumno.nombre}"></span> —
+            Empresa: <span th:text="${practica.empresa.nombre}"></span>
+        </h2>
+
+        <h3 style="margin-bottom:10px; color:#555;">Seguimiento de horas</h3>
+        <table th:if="${seguimientos != null and !#lists.isEmpty(seguimientos)}">
+            <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Horas</th>
+                <th>Descripción</th>
+                <th>Validado</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${seguimientos}">
+                <td th:text="${s.fecha}"></td>
+                <td th:text="${s.horas}"></td>
+                <td th:text="${s.descripcion}"></td>
+                <td th:text="${s.validado ? 'Sí' : 'No'}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${seguimientos == null or #lists.isEmpty(seguimientos)}" class="bienvenida">
+            No hay horas registradas aún.
+        </p>
+
+        <h3 style="margin-top:30px; margin-bottom:10px; color:#555;">Evaluaciones</h3>
+        <table th:if="${evaluaciones != null and !#lists.isEmpty(evaluaciones)}">
+            <thead>
+            <tr>
+                <th>Tutor</th>
+                <th>Nota</th>
+                <th>Comentarios</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="e : ${evaluaciones}">
+                <td th:text="${e.tutor.nombre}"></td>
+                <td th:text="${e.nota}"></td>
+                <td th:text="${e.comentarios}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${evaluaciones == null or #lists.isEmpty(evaluaciones)}" class="bienvenida">
+            No hay evaluaciones registradas aún.
+        </p>
+    </div>
+</div>
+</body>
+</html>

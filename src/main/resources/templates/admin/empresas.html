@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Gestión de Empresas</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/admin/panel}">Panel</a>
+        <a th:href="@{/admin/usuarios}">Usuarios</a>
+        <a th:href="@{/admin/empresas}">Empresas</a>
+        <a th:href="@{/admin/practicas}">Prácticas</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Gestión de Empresas</h1>
+
+    <div class="formulario">
+        <form th:action="@{/admin/empresas/guardar}" th:object="${nuevaEmpresa}" method="post">
+            <div class="formulario-fila">
+                <input type="text" th:field="*{nombre}" placeholder="Nombre" required/>
+                <input type="text" th:field="*{cif}" placeholder="CIF" required/>
+                <input type="text" th:field="*{direccion}" placeholder="Dirección"/>
+                <input type="text" th:field="*{contacto}" placeholder="Contacto"/>
+                <input type="email" th:field="*{email}" placeholder="Email"/>
+                <button type="submit" class="btn-panel btn-verde">Añadir</button>
+            </div>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>CIF</th>
+            <th>Dirección</th>
+            <th>Contacto</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="empresa : ${empresas}">
+            <td th:text="${empresa.id}"></td>
+            <td th:text="${empresa.nombre}"></td>
+            <td th:text="${empresa.cif}"></td>
+            <td th:text="${empresa.direccion}"></td>
+            <td th:text="${empresa.contacto}"></td>
+            <td th:text="${empresa.email}"></td>
+            <td>
+                <a th:href="@{/admin/empresas/eliminar/{id}(id=${empresa.id})}"
+                   class="btn-panel btn-rojo"
+                   onclick="return confirm('¿Seguro que quieres eliminar esta empresa?')">
+                    Eliminar
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

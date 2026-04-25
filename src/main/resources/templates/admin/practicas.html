@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <title>Asignar Prácticas</title>
+</head>
+<body>
+<nav>
+  <span class="marca">Gestión de Prácticas</span>
+  <div>
+    <a th:href="@{/admin/panel}">Panel</a>
+    <a th:href="@{/admin/usuarios}">Usuarios</a>
+    <a th:href="@{/admin/empresas}">Empresas</a>
+    <a th:href="@{/admin/practicas}">Prácticas</a>
+    <a th:href="@{/logout}">Cerrar sesión</a>
+  </div>
+</nav>
+<div class="contenido">
+  <h1 class="panel-titulo">Asignar Prácticas</h1>
+
+  <div class="formulario">
+    <form th:action="@{/admin/practicas/guardar}" th:object="${nuevaPractica}" method="post">
+      <div class="formulario-fila">
+        <select name="alumnoId" required>
+          <option value="">-- Alumno --</option>
+          <option th:each="alumno : ${alumnos}"
+                  th:value="${alumno.id}"
+                  th:text="${alumno.nombre}"></option>
+        </select>
+        <select name="empresaId" required>
+          <option value="">-- Empresa --</option>
+          <option th:each="empresa : ${empresas}"
+                  th:value="${empresa.id}"
+                  th:text="${empresa.nombre}"></option>
+        </select>
+        <select name="tutorEmpresaId" required>
+          <option value="">-- Tutor Empresa --</option>
+          <option th:each="tutor : ${tutoresEmpresa}"
+                  th:value="${tutor.id}"
+                  th:text="${tutor.nombre}"></option>
+        </select>
+        <select name="tutorCentroId" required>
+          <option value="">-- Tutor Centro --</option>
+          <option th:each="tutor : ${tutoresCentro}"
+                  th:value="${tutor.id}"
+                  th:text="${tutor.nombre}"></option>
+        </select>
+        <input type="date" name="fechaInicio" required/>
+        <input type="date" name="fechaFin" required/>
+        <button type="submit" class="btn-panel btn-verde">Asignar</button>
+      </div>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Alumno</th>
+      <th>Empresa</th>
+      <th>Tutor Empresa</th>
+      <th>Tutor Centro</th>
+      <th>Fecha Inicio</th>
+      <th>Fecha Fin</th>
+      <th>Estado</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="practica : ${practicas}">
+      <td th:text="${practica.id}"></td>
+      <td th:text="${practica.alumno.nombre}"></td>
+      <td th:text="${practica.empresa.nombre}"></td>
+      <td th:text="${practica.tutorEmpresa.nombre}"></td>
+      <td th:text="${practica.tutorCentro.nombre}"></td>
+      <td th:text="${practica.fechaInicio}"></td>
+      <td th:text="${practica.fechaFin}"></td>
+      <td th:text="${practica.estado}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

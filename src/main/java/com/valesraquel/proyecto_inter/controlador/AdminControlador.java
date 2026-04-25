@@ -92,7 +92,19 @@ public class AdminControlador {
     }
 
     @PostMapping("/practicas/guardar")
-    public String guardarPractica(@ModelAttribute Practica practica) {
+    public String guardarPractica(@RequestParam Integer alumnoId,
+                                  @RequestParam Integer empresaId,
+                                  @RequestParam Integer tutorEmpresaId,
+                                  @RequestParam Integer tutorCentroId,
+                                  @RequestParam String fechaInicio,
+                                  @RequestParam String fechaFin) {
+        Practica practica = new Practica();
+        alumnoRepositorio.findById(alumnoId).ifPresent(practica::setAlumno);
+        empresaServicio.buscarPorId(empresaId).ifPresent(practica::setEmpresa);
+        tutorRepositorio.findById(tutorEmpresaId).ifPresent(practica::setTutorEmpresa);
+        tutorRepositorio.findById(tutorCentroId).ifPresent(practica::setTutorCentro);
+        practica.setFechaInicio(java.time.LocalDate.parse(fechaInicio));
+        practica.setFechaFin(java.time.LocalDate.parse(fechaFin));
         practica.setEstado(Practica.Estado.ACTIVA);
         practicaServicio.guardar(practica);
         return "redirect:/admin/practicas";

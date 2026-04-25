@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Mis Horas</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/alumno/panel}">Panel</a>
+        <a th:href="@{/alumno/horas}">Mis Horas</a>
+        <a th:href="@{/alumno/evaluaciones}">Mis Evaluaciones</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Registrar Horas</h1>
+
+    <div class="formulario" th:if="${practica != null}">
+        <form th:action="@{/alumno/horas/guardar}" th:object="${nuevoSeguimiento}" method="post">
+            <input type="hidden" name="practicaId" th:value="${practica.id}"/>
+            <div class="formulario-fila">
+                <input type="date" th:field="*{fecha}" required/>
+                <input type="number" th:field="*{horas}" placeholder="Horas" step="0.5" min="0" max="12" required/>
+                <input type="text" th:field="*{descripcion}" placeholder="Descripción de tareas" required/>
+                <button type="submit" class="btn-panel btn-verde">Registrar</button>
+            </div>
+        </form>
+    </div>
+
+    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
+
+    <table th:if="${seguimientos != null and !#lists.isEmpty(seguimientos)}">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Horas</th>
+            <th>Descripción</th>
+            <th>Validado</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${seguimientos}">
+            <td th:text="${s.fecha}"></td>
+            <td th:text="${s.horas}"></td>
+            <td th:text="${s.descripcion}"></td>
+            <td th:text="${s.validado ? 'Sí' : 'No'}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

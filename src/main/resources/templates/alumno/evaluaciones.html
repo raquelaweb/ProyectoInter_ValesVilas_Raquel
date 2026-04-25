@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" th:href="@{/css/estilos.css}">
+  <title>Mis Evaluaciones</title>
+</head>
+<body>
+<nav>
+  <span class="marca">Gestión de Prácticas</span>
+  <div>
+    <a th:href="@{/alumno/panel}">Panel</a>
+    <a th:href="@{/alumno/horas}">Mis Horas</a>
+    <a th:href="@{/alumno/evaluaciones}">Mis Evaluaciones</a>
+    <a th:href="@{/logout}">Cerrar sesión</a>
+  </div>
+</nav>
+<div class="contenido">
+  <h1 class="panel-titulo">Mis Evaluaciones</h1>
+
+  <p th:if="${evaluaciones == null or #lists.isEmpty(evaluaciones)}" class="bienvenida">
+    Aún no tienes evaluaciones registradas.
+  </p>
+
+  <table th:if="${evaluaciones != null and !#lists.isEmpty(evaluaciones)}">
+    <thead>
+    <tr>
+      <th>Tutor</th>
+      <th>Nota</th>
+      <th>Comentarios</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="e : ${evaluaciones}">
+      <td th:text="${e.tutor.nombre}"></td>
+      <td th:text="${e.nota}"></td>
+      <td th:text="${e.comentarios}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
