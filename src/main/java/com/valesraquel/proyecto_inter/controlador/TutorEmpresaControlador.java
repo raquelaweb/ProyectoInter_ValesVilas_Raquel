@@ -1,10 +1,12 @@
 package com.valesraquel.proyecto_inter.controlador;
 
+import com.valesraquel.proyecto_inter.modelo.Documento;
 import com.valesraquel.proyecto_inter.modelo.Evaluacion;
 import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.modelo.Seguimiento;
 import com.valesraquel.proyecto_inter.modelo.Tutor;
 import com.valesraquel.proyecto_inter.modelo.Usuario;
+import com.valesraquel.proyecto_inter.repositorio.DocumentoRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.PracticaRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.TutorRepositorio;
 import com.valesraquel.proyecto_inter.servicio.EvaluacionServicio;
@@ -27,6 +29,7 @@ public class TutorEmpresaControlador {
     @Autowired private EvaluacionServicio evaluacionServicio;
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private PracticaRepositorio practicaRepositorio;
+    @Autowired private DocumentoRepositorio documentoRepositorio;
 
     // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
@@ -87,5 +90,43 @@ public class TutorEmpresaControlador {
         tutorRepositorio.findById(tutorId).ifPresent(evaluacion::setTutor);
         evaluacionServicio.guardar(evaluacion);
         return "redirect:/tutorempresa/evaluaciones";
+    }
+
+    // Muestra los documentos subidos por el tutor de empresa
+    @GetMapping("/documentos")
+    public String verDocumentos(HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("usuario", usuario);
+        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
+        tutor.ifPresent(t -> {
+            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
+            if (!practicas.isEmpty()) {
+                Practica p = practicas.get(0);
+                model.addAttribute("practica", p);
+                model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
+            }
+        });
+        return "tutorempresa/documentos";
+    }
+
+    // Guarda un nuevo documento registrado por el tutor de empresa
+    @PostMapping("/documentos/guardar")
+    public String guardarDocumento(@RequestParam String tipo,
+                                   @RequestParam String nombre,
+                                   @RequestParam Integer practicaId,
+                                   HttpSession session) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        practicaRepositorio.findById(practicaId).ifPresent(p -> {
+            Documento doc = new Documento();
+            doc.setPractica(p);
+            doc.setTipo(tipo);
+            doc.setRuta(nombre);
+            doc.setFechaSubida(java.time.LocalDate.now());
+            doc.setSubidoPor(usuario);
+            documentoRepositorio.save(doc);
+        });
+        return "redirect:/tutorempresa/documentos";
     }
 }

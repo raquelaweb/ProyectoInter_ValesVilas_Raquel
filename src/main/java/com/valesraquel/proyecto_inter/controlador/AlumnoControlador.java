@@ -1,10 +1,12 @@
 package com.valesraquel.proyecto_inter.controlador;
 
 import com.valesraquel.proyecto_inter.modelo.Alumno;
+import com.valesraquel.proyecto_inter.modelo.Documento;
 import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.modelo.Seguimiento;
 import com.valesraquel.proyecto_inter.modelo.Usuario;
 import com.valesraquel.proyecto_inter.repositorio.AlumnoRepositorio;
+import com.valesraquel.proyecto_inter.repositorio.DocumentoRepositorio;
 import com.valesraquel.proyecto_inter.servicio.EvaluacionServicio;
 import com.valesraquel.proyecto_inter.servicio.PracticaServicio;
 import com.valesraquel.proyecto_inter.servicio.SeguimientoServicio;
@@ -26,6 +28,7 @@ public class AlumnoControlador {
     @Autowired private SeguimientoServicio seguimientoServicio;
     @Autowired private EvaluacionServicio evaluacionServicio;
     @Autowired private AlumnoRepositorio alumnoRepositorio;
+    @Autowired private DocumentoRepositorio documentoRepositorio;
 
     // Muestra el panel principal del alumno
     @GetMapping("/panel")
@@ -80,5 +83,43 @@ public class AlumnoControlador {
             }
         });
         return "alumno/evaluaciones";
+    }
+
+    // Muestra los documentos subidos por el alumno
+    @GetMapping("/documentos")
+    public String verDocumentos(HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
+        alumno.ifPresent(a -> {
+            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
+            if (!practicas.isEmpty()) {
+                Practica p = practicas.get(0);
+                model.addAttribute("practica", p);
+                model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
+            }
+        });
+        model.addAttribute("usuario", usuario);
+        return "alumno/documentos";
+    }
+
+    // Guarda un nuevo documento registrado por el alumno
+    @PostMapping("/documentos/guardar")
+    public String guardarDocumento(@RequestParam String tipo,
+                                   @RequestParam String nombre,
+                                   @RequestParam Integer practicaId,
+                                   HttpSession session) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        practicaServicio.buscarPorId(practicaId).ifPresent(p -> {
+            Documento doc = new Documento();
+            doc.setPractica(p);
+            doc.setTipo(tipo);
+            doc.setRuta(nombre);
+            doc.setFechaSubida(java.time.LocalDate.now());
+            doc.setSubidoPor(usuario);
+            documentoRepositorio.save(doc);
+        });
+        return "redirect:/alumno/documentos";
     }
 }

@@ -10,8 +10,10 @@
 <nav>
   <span class="marca">Gestión de Prácticas</span>
   <div>
+    <a th:href="@{/alumno/panel}">Panel</a>
     <a th:href="@{/alumno/horas}">Mis Horas</a>
     <a th:href="@{/alumno/evaluaciones}">Mis Evaluaciones</a>
+    <a th:href="@{/alumno/documentos}">Mis Documentos</a>
     <a th:href="@{/logout}">Cerrar sesión</a>
   </div>
 </nav>
@@ -21,6 +23,7 @@
   <div class="botones-panel">
     <a th:href="@{/alumno/horas}" class="btn-panel">Registrar Horas</a>
     <a th:href="@{/alumno/evaluaciones}" class="btn-panel">Ver Evaluaciones</a>
+    <a th:href="@{/alumno/documentos}" class="btn-panel">Mis Documentos</a>
     <a th:href="@{/logout}" class="btn-panel btn-rojo">Cerrar sesión</a>
   </div>
 </div>

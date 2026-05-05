@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Mis Documentos</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/alumno/panel}">Panel</a>
+        <a th:href="@{/alumno/horas}">Mis Horas</a>
+        <a th:href="@{/alumno/evaluaciones}">Mis Evaluaciones</a>
+        <a th:href="@{/alumno/documentos}">Mis Documentos</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Mis Documentos</h1>
+
+    <div class="formulario" th:if="${practica != null}">
+        <form th:action="@{/alumno/documentos/guardar}" method="post">
+            <input type="hidden" name="practicaId" th:value="${practica.id}"/>
+            <div class="formulario-fila">
+                <select name="tipo" required>
+                    <option value="">-- Tipo de documento --</option>
+                    <option value="Informe parcial">Informe parcial</option>
+                    <option value="Informe final">Informe final</option>
+                    <option value="Certificado">Certificado</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <input type="text" name="nombre" placeholder="Nombre del documento" required/>
+                <button type="submit" class="btn-panel btn-verde">Registrar documento</button>
+            </div>
+        </form>
+    </div>
+
+    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
+
+    <table th:if="${documentos != null and !#lists.isEmpty(documentos)}">
+        <thead>
+        <tr>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Fecha</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="doc : ${documentos}">
+            <td th:text="${doc.tipo}"></td>
+            <td th:text="${doc.ruta}"></td>
+            <td th:text="${doc.fechaSubida}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${documentos == null or #lists.isEmpty(documentos)}" class="bienvenida">
+        No hay documentos registrados aún.
+    </p>
+</div>
+</body>
+</html>
