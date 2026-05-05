@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" th:href="@{/css/estilos.css}">
-  <title>Documentos</title>
+  <title>Panel Tutor Empresa</title>
 </head>
 <body>
 <nav>
@@ -18,49 +18,14 @@
   </div>
 </nav>
 <div class="contenido">
-  <h1 class="panel-titulo">Documentos de la Práctica</h1>
-
-  <div class="formulario" th:if="${practica != null}">
-    <form th:action="@{/tutorempresa/documentos/guardar}" method="post">
-      <input type="hidden" name="practicaId" th:value="${practica.id}"/>
-      <div class="formulario-fila">
-        <select name="tipo" required>
-          <option value="">-- Tipo de documento --</option>
-          <option value="Informe parcial">Informe parcial</option>
-          <option value="Informe final">Informe final</option>
-          <option value="Certificado">Certificado</option>
-          <option value="Otro">Otro</option>
-        </select>
-        <input type="text" name="nombre" placeholder="Nombre del documento" required/>
-        <button type="submit" class="btn-panel btn-verde">Registrar documento</button>
-      </div>
-    </form>
+  <h1 class="panel-titulo">Panel de Tutor de Empresa</h1>
+  <p class="bienvenida" th:text="'Bienvenido/a, ' + ${usuario.nombre}"></p>
+  <div class="botones-panel">
+    <a th:href="@{/tutorempresa/horas}" class="btn-panel">Validar Horas</a>
+    <a th:href="@{/tutorempresa/evaluaciones}" class="btn-panel">Evaluar Alumno</a>
+    <a th:href="@{/tutorempresa/documentos}" class="btn-panel">Documentos</a>
+    <a th:href="@{/logout}" class="btn-panel btn-rojo">Cerrar sesión</a>
   </div>
-
-  <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
-
-  <table th:if="${documentos != null and !#lists.isEmpty(documentos)}">
-    <thead>
-    <tr>
-      <th>Tipo</th>
-      <th>Nombre</th>
-      <th>Fecha</th>
-      <th>Subido por</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="doc : ${documentos}">
-      <td th:text="${doc.tipo}"></td>
-      <td th:text="${doc.ruta}"></td>
-      <td th:text="${doc.fechaSubida}"></td>
-      <td th:text="${doc.subidoPor.nombre}"></td>
-    </tr>
-    </tbody>
-  </table>
-
-  <p th:if="${documentos == null or #lists.isEmpty(documentos)}" class="bienvenida">
-    No hay documentos registrados aún.
-  </p>
 </div>
 </body>
 </html>
