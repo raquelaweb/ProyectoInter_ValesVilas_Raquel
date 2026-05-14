@@ -61,7 +61,7 @@
                     <td th:text="${e.tutor.nombre}"></td>
                     <td th:text="${e.nota}"></td>
                     <td th:text="${e.comentarios}"></td>
-                    <td th:text="${e.validada ? 'Sí' : 'No'}"></td>
+                    <td th:text="${e.validada != null and e.validada ? 'Sí' : 'No'}"></td>
                 </tr>
                 </tbody>
             </table>
