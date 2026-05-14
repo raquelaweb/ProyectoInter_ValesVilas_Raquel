@@ -16,9 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 // Controlador que gestiona las funcionalidades del tutor de empresa
 @Controller
@@ -30,6 +34,9 @@ public class TutorEmpresaControlador {
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private PracticaRepositorio practicaRepositorio;
     @Autowired private DocumentoRepositorio documentoRepositorio;
+
+    // Directorio donde se guardan los archivos subidos
+    private static final String UPLOAD_DIR = "uploads/";
 
     // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
@@ -110,22 +117,32 @@ public class TutorEmpresaControlador {
         return "tutorempresa/documentos";
     }
 
-    // Guarda un nuevo documento registrado por el tutor de empresa
+    // Guarda un documento subido por el tutor de empresa
     @PostMapping("/documentos/guardar")
     public String guardarDocumento(@RequestParam String tipo,
-                                   @RequestParam String nombre,
+                                   @RequestParam MultipartFile archivo,
                                    @RequestParam Integer practicaId,
                                    HttpSession session) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         practicaRepositorio.findById(practicaId).ifPresent(p -> {
-            Documento doc = new Documento();
-            doc.setPractica(p);
-            doc.setTipo(tipo);
-            doc.setRuta(nombre);
-            doc.setFechaSubida(java.time.LocalDate.now());
-            doc.setSubidoPor(usuario);
-            documentoRepositorio.save(doc);
+            if (archivo != null && !archivo.isEmpty()) {
+                try {
+                    File dir = new File(UPLOAD_DIR);
+                    if (!dir.exists()) dir.mkdirs();
+                    String nombreUnico = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
+                    archivo.transferTo(new File(UPLOAD_DIR + nombreUnico));
+                    Documento doc = new Documento();
+                    doc.setPractica(p);
+                    doc.setTipo(tipo);
+                    doc.setRuta(nombreUnico);
+                    doc.setFechaSubida(java.time.LocalDate.now());
+                    doc.setSubidoPor(usuario);
+                    documentoRepositorio.save(doc);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         });
         return "redirect:/tutorempresa/documentos";
     }

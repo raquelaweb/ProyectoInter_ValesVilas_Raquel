@@ -21,7 +21,7 @@
     <h1 class="panel-titulo">Documentos de la Práctica</h1>
 
     <div class="formulario" th:if="${practica != null}">
-        <form th:action="@{/tutorempresa/documentos/guardar}" method="post">
+        <form th:action="@{/tutorempresa/documentos/guardar}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="practicaId" th:value="${practica.id}"/>
             <div class="formulario-fila">
                 <select name="tipo" required>
@@ -31,8 +31,8 @@
                     <option value="Certificado">Certificado</option>
                     <option value="Otro">Otro</option>
                 </select>
-                <input type="text" name="nombre" placeholder="Nombre del documento" required/>
-                <button type="submit" class="btn-panel btn-verde">Registrar documento</button>
+                <input type="file" name="archivo" required/>
+                <button type="submit" class="btn-panel btn-verde">Subir documento</button>
             </div>
         </form>
     </div>

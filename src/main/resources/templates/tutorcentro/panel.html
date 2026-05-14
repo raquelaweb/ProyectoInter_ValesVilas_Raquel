@@ -10,7 +10,9 @@
 <nav>
     <span class="marca">Gestión de Prácticas</span>
     <div>
+        <a th:href="@{/tutorcentro/panel}">Panel</a>
         <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
+        <a th:href="@{/tutorcentro/informe}">Generar Informe</a>
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </nav>
@@ -19,6 +21,7 @@
     <p class="bienvenida" th:text="'Bienvenido/a, ' + ${usuario.nombre}"></p>
     <div class="botones-panel">
         <a th:href="@{/tutorcentro/practicas}" class="btn-panel">Supervisar Prácticas</a>
+        <a th:href="@{/tutorcentro/informe}" class="btn-panel">Generar Informe</a>
         <a th:href="@{/logout}" class="btn-panel btn-rojo">Cerrar sesión</a>
     </div>
 </div>

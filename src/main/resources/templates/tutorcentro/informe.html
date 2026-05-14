@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Informe de Prácticas</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/tutorcentro/panel}">Panel</a>
+        <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
+        <a th:href="@{/tutorcentro/informe}">Generar Informe</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Informe de Prácticas</h1>
+
+    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
+
+    <div th:if="${practica != null}">
+
+        <div class="formulario">
+            <h3 style="color:#1976D2; margin-bottom:15px;">Datos generales</h3>
+            <p><strong>Alumno:</strong> <span th:text="${practica.alumno.nombre}"></span></p>
+            <p><strong>Empresa:</strong> <span th:text="${practica.empresa.nombre}"></span></p>
+            <p><strong>Tutor de empresa:</strong> <span th:text="${practica.tutorEmpresa.nombre}"></span></p>
+            <p><strong>Fecha de inicio:</strong> <span th:text="${practica.fechaInicio}"></span></p>
+            <p><strong>Fecha de fin:</strong> <span th:text="${practica.fechaFin}"></span></p>
+            <p><strong>Estado:</strong> <span th:text="${practica.estado}"></span></p>
+        </div>
+
+        <div class="formulario" style="margin-top:20px;">
+            <h3 style="color:#1976D2; margin-bottom:15px;">Resumen de horas</h3>
+            <p><strong>Total de registros:</strong> <span th:text="${#lists.size(seguimientos)}"></span></p>
+            <p><strong>Total horas validadas:</strong> <span th:text="${totalHoras}"></span></p>
+        </div>
+
+        <div class="formulario" style="margin-top:20px;">
+            <h3 style="color:#1976D2; margin-bottom:15px;">Resumen de evaluaciones</h3>
+            <p><strong>Total de evaluaciones:</strong> <span th:text="${#lists.size(evaluaciones)}"></span></p>
+            <p><strong>Nota media:</strong> <span th:text="${mediaNotas}"></span></p>
+        </div>
+
+        <div class="formulario" style="margin-top:20px;">
+            <h3 style="color:#1976D2; margin-bottom:15px;">Detalle de evaluaciones</h3>
+            <table th:if="${evaluaciones != null and !#lists.isEmpty(evaluaciones)}">
+                <thead>
+                <tr>
+                    <th>Tutor</th>
+                    <th>Nota</th>
+                    <th>Comentarios</th>
+                    <th>Validada</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="e : ${evaluaciones}">
+                    <td th:text="${e.tutor.nombre}"></td>
+                    <td th:text="${e.nota}"></td>
+                    <td th:text="${e.comentarios}"></td>
+                    <td th:text="${e.validada ? 'Sí' : 'No'}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${evaluaciones == null or #lists.isEmpty(evaluaciones)}" class="bienvenida">
+                No hay evaluaciones registradas aún.
+            </p>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

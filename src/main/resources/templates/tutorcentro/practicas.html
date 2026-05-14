@@ -12,6 +12,7 @@
     <div>
         <a th:href="@{/tutorcentro/panel}">Panel</a>
         <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
+        <a th:href="@{/tutorcentro/informe}">Generar Informe</a>
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </nav>
@@ -56,6 +57,8 @@
                 <th>Tutor</th>
                 <th>Nota</th>
                 <th>Comentarios</th>
+                <th>Validada</th>
+                <th>Acción</th>
             </tr>
             </thead>
             <tbody>
@@ -63,6 +66,16 @@
                 <td th:text="${e.tutor.nombre}"></td>
                 <td th:text="${e.nota}"></td>
                 <td th:text="${e.comentarios}"></td>
+                <td th:text="${e.validada ? 'Sí' : 'No'}"></td>
+                <td>
+                    <a th:if="${!e.validada}"
+                       th:href="@{/tutorcentro/evaluaciones/validar/{id}(id=${e.id})}"
+                       class="btn-panel btn-verde"
+                       style="padding:6px 12px; font-size:12px;">
+                        Validar
+                    </a>
+                    <span th:if="${e.validada}" style="color:#4CAF50; font-weight:bold;">✓ Validada</span>
+                </td>
             </tr>
             </tbody>
         </table>

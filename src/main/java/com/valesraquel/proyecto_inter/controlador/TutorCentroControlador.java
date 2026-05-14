@@ -51,4 +51,43 @@ public class TutorCentroControlador {
         });
         return "tutorcentro/practicas";
     }
+
+    // Valida una evaluación como revisada por el tutor de centro
+    @GetMapping("/evaluaciones/validar/{id}")
+    public String validarEvaluacion(@PathVariable Integer id) {
+        evaluacionServicio.validar(id);
+        return "redirect:/tutorcentro/practicas";
+    }
+
+    // Genera un informe resumen de la práctica asignada al tutor de centro
+    @GetMapping("/informe")
+    public String generarInforme(HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
+        tutor.ifPresent(t -> {
+            List<Practica> practicas = practicaRepositorio.findByTutorCentro(t);
+            if (!practicas.isEmpty()) {
+                Practica practica = practicas.get(0);
+                List<com.valesraquel.proyecto_inter.modelo.Seguimiento> seguimientos =
+                        seguimientoServicio.listarPorPractica(practica);
+                List<com.valesraquel.proyecto_inter.modelo.Evaluacion> evaluaciones =
+                        evaluacionServicio.listarPorPractica(practica);
+                float totalHoras = (float) seguimientos.stream()
+                        .filter(s -> Boolean.TRUE.equals(s.getValidado()))
+                        .mapToDouble(s -> s.getHoras() != null ? s.getHoras() : 0)
+                        .sum();
+                float mediaNotas = (float) evaluaciones.stream()
+                        .filter(e -> e.getNota() != null)
+                        .mapToDouble(com.valesraquel.proyecto_inter.modelo.Evaluacion::getNota)
+                        .average().orElse(0);
+                model.addAttribute("practica", practica);
+                model.addAttribute("seguimientos", seguimientos);
+                model.addAttribute("evaluaciones", evaluaciones);
+                model.addAttribute("totalHoras", totalHoras);
+                model.addAttribute("mediaNotas", mediaNotas);
+            }
+        });
+        return "tutorcentro/informe";
+    }
 }

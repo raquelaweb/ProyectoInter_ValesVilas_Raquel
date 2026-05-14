@@ -24,6 +24,9 @@ public class Evaluacion {
     private Float nota;
     private String comentarios;
 
+    // El tutor de centro puede marcar la evaluación como validada
+    private Boolean validada = false;
+
     // Getters y setters
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -35,4 +38,6 @@ public class Evaluacion {
     public void setNota(Float nota) { this.nota = nota; }
     public String getComentarios() { return comentarios; }
     public void setComentarios(String comentarios) { this.comentarios = comentarios; }
+    public Boolean getValidada() { return validada; }
+    public void setValidada(Boolean validada) { this.validada = validada; }
 }

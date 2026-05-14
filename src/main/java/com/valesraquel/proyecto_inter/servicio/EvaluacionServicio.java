@@ -23,4 +23,12 @@ public class EvaluacionServicio {
     public Evaluacion guardar(Evaluacion evaluacion) {
         return repositorio.save(evaluacion);
     }
+
+    // Marca una evaluación como validada por el tutor de centro
+    public void validar(Integer id) {
+        repositorio.findById(id).ifPresent(e -> {
+            e.setValidada(true);
+            repositorio.save(e);
+        });
+    }
 }
