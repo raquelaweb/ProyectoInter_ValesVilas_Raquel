@@ -42,7 +42,7 @@
                 <td th:text="${s.fecha}"></td>
                 <td th:text="${s.horas}"></td>
                 <td th:text="${s.descripcion}"></td>
-                <td th:text="${s.validado ? 'Sí' : 'No'}"></td>
+                <td th:text="${s.validado != null and s.validado ? 'Sí' : 'No'}"></td>
             </tr>
             </tbody>
         </table>
@@ -66,15 +66,15 @@
                 <td th:text="${e.tutor.nombre}"></td>
                 <td th:text="${e.nota}"></td>
                 <td th:text="${e.comentarios}"></td>
-                <td th:text="${e.validada ? 'Sí' : 'No'}"></td>
+                <td th:text="${e.validada != null and e.validada ? 'Sí' : 'No'}"></td>
                 <td>
-                    <a th:if="${!e.validada}"
+                    <a th:if="${e.validada == null or !e.validada}"
                        th:href="@{/tutorcentro/evaluaciones/validar/{id}(id=${e.id})}"
                        class="btn-panel btn-verde"
                        style="padding:6px 12px; font-size:12px;">
                         Validar
                     </a>
-                    <span th:if="${e.validada}" style="color:#4CAF50; font-weight:bold;">✓ Validada</span>
+                    <span th:if="${e.validada != null and e.validada}" style="color:#4CAF50; font-weight:bold;">Validada</span>
                 </td>
             </tr>
             </tbody>
