@@ -34,8 +34,16 @@ public class AlumnoControlador {
     @Autowired private AlumnoRepositorio alumnoRepositorio;
     @Autowired private DocumentoRepositorio documentoRepositorio;
 
-    // Directorio donde se guardan los archivos subidos
     private static final String UPLOAD_DIR = "uploads/";
+
+    // Devuelve la práctica activa del alumno, o la primera si no hay ninguna activa
+    private Optional<Practica> getPracticaActiva(Alumno alumno) {
+        List<Practica> practicas = practicaServicio.buscarPorAlumno(alumno);
+        return practicas.stream()
+                .filter(p -> p.getEstado() == Practica.Estado.ACTIVA)
+                .findFirst()
+                .or(() -> practicas.stream().findFirst());
+    }
 
     // Muestra el panel principal del alumno
     @GetMapping("/panel")
@@ -50,14 +58,11 @@ public class AlumnoControlador {
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
-        alumno.ifPresent(a -> {
-            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
-            if (!practicas.isEmpty()) {
-                Practica p = practicas.get(0);
+        alumnoRepositorio.findById(usuario.getId()).ifPresent(a -> {
+            getPracticaActiva(a).ifPresent(p -> {
                 model.addAttribute("practica", p);
                 model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(p));
-            }
+            });
         });
         model.addAttribute("nuevoSeguimiento", new Seguimiento());
         return "alumno/horas";
@@ -82,12 +87,10 @@ public class AlumnoControlador {
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
-        alumno.ifPresent(a -> {
-            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
-            if (!practicas.isEmpty()) {
-                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(practicas.get(0)));
-            }
+        alumnoRepositorio.findById(usuario.getId()).ifPresent(a -> {
+            getPracticaActiva(a).ifPresent(p ->
+                    model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(p))
+            );
         });
         return "alumno/evaluaciones";
     }
@@ -97,14 +100,11 @@ public class AlumnoControlador {
     public String verDocumentos(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Alumno> alumno = alumnoRepositorio.findById(usuario.getId());
-        alumno.ifPresent(a -> {
-            List<Practica> practicas = practicaServicio.buscarPorAlumno(a);
-            if (!practicas.isEmpty()) {
-                Practica p = practicas.get(0);
+        alumnoRepositorio.findById(usuario.getId()).ifPresent(a -> {
+            getPracticaActiva(a).ifPresent(p -> {
                 model.addAttribute("practica", p);
                 model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
-            }
+            });
         });
         model.addAttribute("usuario", session.getAttribute("usuario"));
         return "alumno/documentos";
@@ -119,14 +119,11 @@ public class AlumnoControlador {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         practicaServicio.buscarPorId(practicaId).ifPresent(p -> {
-            String nombreArchivo = archivo.getOriginalFilename();
             if (archivo != null && !archivo.isEmpty()) {
                 try {
-                    // Crear directorio si no existe
                     File dir = new File(UPLOAD_DIR);
                     if (!dir.exists()) dir.mkdirs();
-                    // Guardar el archivo con nombre único para evitar colisiones
-                    String nombreUnico = UUID.randomUUID() + "_" + nombreArchivo;
+                    String nombreUnico = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
                     archivo.transferTo(new File(UPLOAD_DIR + nombreUnico));
                     Documento doc = new Documento();
                     doc.setPractica(p);

@@ -35,8 +35,16 @@ public class TutorEmpresaControlador {
     @Autowired private PracticaRepositorio practicaRepositorio;
     @Autowired private DocumentoRepositorio documentoRepositorio;
 
-    // Directorio donde se guardan los archivos subidos
     private static final String UPLOAD_DIR = "uploads/";
+
+    // Devuelve la práctica activa del tutor de empresa, o la primera si no hay ninguna activa
+    private Optional<Practica> getPracticaActiva(Tutor tutor) {
+        List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(tutor);
+        return practicas.stream()
+                .filter(p -> p.getEstado() == Practica.Estado.ACTIVA)
+                .findFirst()
+                .or(() -> practicas.stream().findFirst());
+    }
 
     // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
@@ -51,14 +59,11 @@ public class TutorEmpresaControlador {
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
-        tutor.ifPresent(t -> {
-            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
-            if (!practicas.isEmpty()) {
-                Practica practica = practicas.get(0);
-                model.addAttribute("practica", practica);
-                model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(practica));
-            }
+        tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
+            getPracticaActiva(t).ifPresent(p -> {
+                model.addAttribute("practica", p);
+                model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(p));
+            });
         });
         return "tutorempresa/horas";
     }
@@ -76,13 +81,11 @@ public class TutorEmpresaControlador {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         model.addAttribute("usuario", session.getAttribute("usuario"));
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
-        tutor.ifPresent(t -> {
-            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
-            if (!practicas.isEmpty()) {
-                model.addAttribute("practica", practicas.get(0));
-                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(practicas.get(0)));
-            }
+        tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
+            getPracticaActiva(t).ifPresent(p -> {
+                model.addAttribute("practica", p);
+                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(p));
+            });
         });
         model.addAttribute("nuevaEvaluacion", new Evaluacion());
         return "tutorempresa/evaluaciones";
@@ -105,14 +108,11 @@ public class TutorEmpresaControlador {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("usuario", usuario);
-        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
-        tutor.ifPresent(t -> {
-            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
-            if (!practicas.isEmpty()) {
-                Practica p = practicas.get(0);
+        tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
+            getPracticaActiva(t).ifPresent(p -> {
                 model.addAttribute("practica", p);
                 model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
-            }
+            });
         });
         return "tutorempresa/documentos";
     }

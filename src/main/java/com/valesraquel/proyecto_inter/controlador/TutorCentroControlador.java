@@ -26,6 +26,15 @@ public class TutorCentroControlador {
     @Autowired private TutorRepositorio tutorRepositorio;
     @Autowired private PracticaRepositorio practicaRepositorio;
 
+    // Devuelve la práctica activa del tutor de centro, o la primera si no hay ninguna activa
+    private Optional<Practica> getPracticaActiva(Tutor tutor) {
+        List<Practica> practicas = practicaRepositorio.findByTutorCentro(tutor);
+        return practicas.stream()
+                .filter(p -> p.getEstado() == Practica.Estado.ACTIVA)
+                .findFirst()
+                .or(() -> practicas.stream().findFirst());
+    }
+
     // Muestra el panel principal del tutor de centro
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
@@ -39,15 +48,12 @@ public class TutorCentroControlador {
     public String supervisarPracticas(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
-        tutor.ifPresent(t -> {
-            List<Practica> practicas = practicaRepositorio.findByTutorCentro(t);
-            if (!practicas.isEmpty()) {
-                Practica practica = practicas.get(0);
+        tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
+            getPracticaActiva(t).ifPresent(practica -> {
                 model.addAttribute("practica", practica);
                 model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(practica));
                 model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(practica));
-            }
+            });
         });
         return "tutorcentro/practicas";
     }
@@ -59,16 +65,13 @@ public class TutorCentroControlador {
         return "redirect:/tutorcentro/practicas";
     }
 
-    // Genera un informe resumen de la práctica asignada al tutor de centro
+    // Genera un informe resumen de la práctica activa asignada al tutor de centro
     @GetMapping("/informe")
     public String generarInforme(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        Optional<Tutor> tutor = tutorRepositorio.findById(usuario.getId());
-        tutor.ifPresent(t -> {
-            List<Practica> practicas = practicaRepositorio.findByTutorCentro(t);
-            if (!practicas.isEmpty()) {
-                Practica practica = practicas.get(0);
+        tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
+            getPracticaActiva(t).ifPresent(practica -> {
                 List<com.valesraquel.proyecto_inter.modelo.Seguimiento> seguimientos =
                         seguimientoServicio.listarPorPractica(practica);
                 List<com.valesraquel.proyecto_inter.modelo.Evaluacion> evaluaciones =
@@ -86,7 +89,7 @@ public class TutorCentroControlador {
                 model.addAttribute("evaluaciones", evaluaciones);
                 model.addAttribute("totalHoras", totalHoras);
                 model.addAttribute("mediaNotas", mediaNotas);
-            }
+            });
         });
         return "tutorcentro/informe";
     }
