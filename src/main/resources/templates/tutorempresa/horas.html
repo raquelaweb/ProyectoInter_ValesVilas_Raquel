@@ -13,37 +13,36 @@
         <a th:href="@{/tutorempresa/panel}">Panel</a>
         <a th:href="@{/tutorempresa/horas}">Validar Horas</a>
         <a th:href="@{/tutorempresa/evaluaciones}">Evaluar Alumno</a>
+        <a th:href="@{/tutorempresa/documentos}">Documentos</a>
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </nav>
 <div class="contenido">
     <h1 class="panel-titulo">Validar Horas</h1>
 
-    <p th:if="${seguimientos == null or #lists.isEmpty(seguimientos)}" class="bienvenida">
-        No hay horas registradas para validar.
+    <p th:if="${practicas == null or #lists.isEmpty(practicas)}" class="bienvenida">
+        No tienes ninguna práctica asignada.
     </p>
 
-    <table th:if="${seguimientos != null and !#lists.isEmpty(seguimientos)}">
+    <table th:if="${practicas != null and !#lists.isEmpty(practicas)}">
         <thead>
         <tr>
-            <th>Fecha</th>
-            <th>Horas</th>
-            <th>Descripción</th>
-            <th>Validado</th>
+            <th>Alumno</th>
+            <th>Empresa</th>
+            <th>Estado</th>
             <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="s : ${seguimientos}">
-            <td th:text="${s.fecha}"></td>
-            <td th:text="${s.horas}"></td>
-            <td th:text="${s.descripcion}"></td>
-            <td th:text="${s.validado ? 'Sí' : 'No'}"></td>
+        <tr th:each="p : ${practicas}">
+            <td th:text="${p.alumno.nombre}"></td>
+            <td th:text="${p.empresa.nombre}"></td>
+            <td th:text="${p.estado}"></td>
             <td>
-                <a th:if="${!s.validado}"
-                   th:href="@{/tutorempresa/horas/validar/{id}(id=${s.id})}"
-                   class="btn-panel btn-verde">Validar</a>
-                <span th:if="${s.validado}">✓ Validado</span>
+                <a th:href="@{/tutorempresa/horas/{id}(id=${p.id})}"
+                   class="btn-panel" style="padding:6px 12px; font-size:12px;">
+                    Ver horas
+                </a>
             </td>
         </tr>
         </tbody>

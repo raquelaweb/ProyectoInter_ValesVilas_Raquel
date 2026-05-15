@@ -18,49 +18,35 @@
     </div>
 </nav>
 <div class="contenido">
-    <h1 class="panel-titulo">Documentos de la Práctica</h1>
+    <h1 class="panel-titulo">Documentos</h1>
 
-    <div class="formulario" th:if="${practica != null}">
-        <form th:action="@{/tutorempresa/documentos/guardar}" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="practicaId" th:value="${practica.id}"/>
-            <div class="formulario-fila">
-                <select name="tipo" required>
-                    <option value="">-- Tipo de documento --</option>
-                    <option value="Informe parcial">Informe parcial</option>
-                    <option value="Informe final">Informe final</option>
-                    <option value="Certificado">Certificado</option>
-                    <option value="Otro">Otro</option>
-                </select>
-                <input type="file" name="archivo" required/>
-                <button type="submit" class="btn-panel btn-verde">Subir documento</button>
-            </div>
-        </form>
-    </div>
+    <p th:if="${practicas == null or #lists.isEmpty(practicas)}" class="bienvenida">
+        No tienes ninguna práctica asignada.
+    </p>
 
-    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
-
-    <table th:if="${documentos != null and !#lists.isEmpty(documentos)}">
+    <table th:if="${practicas != null and !#lists.isEmpty(practicas)}">
         <thead>
         <tr>
-            <th>Tipo</th>
-            <th>Nombre</th>
-            <th>Fecha</th>
-            <th>Subido por</th>
+            <th>Alumno</th>
+            <th>Empresa</th>
+            <th>Estado</th>
+            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="doc : ${documentos}">
-            <td th:text="${doc.tipo}"></td>
-            <td th:text="${doc.ruta}"></td>
-            <td th:text="${doc.fechaSubida}"></td>
-            <td th:text="${doc.subidoPor.nombre}"></td>
+        <tr th:each="p : ${practicas}">
+            <td th:text="${p.alumno.nombre}"></td>
+            <td th:text="${p.empresa.nombre}"></td>
+            <td th:text="${p.estado}"></td>
+            <td>
+                <a th:href="@{/tutorempresa/documentos/{id}(id=${p.id})}"
+                   class="btn-panel" style="padding:6px 12px; font-size:12px;">
+                    Ver documentos
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>
-
-    <p th:if="${documentos == null or #lists.isEmpty(documentos)}" class="bienvenida">
-        No hay documentos registrados aún.
-    </p>
 </div>
 </body>
 </html>

@@ -3,7 +3,6 @@ package com.valesraquel.proyecto_inter.controlador;
 import com.valesraquel.proyecto_inter.modelo.Documento;
 import com.valesraquel.proyecto_inter.modelo.Evaluacion;
 import com.valesraquel.proyecto_inter.modelo.Practica;
-import com.valesraquel.proyecto_inter.modelo.Seguimiento;
 import com.valesraquel.proyecto_inter.modelo.Tutor;
 import com.valesraquel.proyecto_inter.modelo.Usuario;
 import com.valesraquel.proyecto_inter.repositorio.DocumentoRepositorio;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 // Controlador que gestiona las funcionalidades del tutor de empresa
@@ -37,15 +35,6 @@ public class TutorEmpresaControlador {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    // Devuelve la práctica activa del tutor de empresa, o la primera si no hay ninguna activa
-    private Optional<Practica> getPracticaActiva(Tutor tutor) {
-        List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(tutor);
-        return practicas.stream()
-                .filter(p -> p.getEstado() == Practica.Estado.ACTIVA)
-                .findFirst()
-                .or(() -> practicas.stream().findFirst());
-    }
-
     // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
@@ -54,41 +43,62 @@ public class TutorEmpresaControlador {
         return "tutorempresa/panel";
     }
 
-    // Muestra las horas registradas por el alumno para que el tutor pueda validarlas
+    // Muestra todas las prácticas asignadas al tutor de empresa
     @GetMapping("/horas")
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
-            getPracticaActiva(t).ifPresent(p -> {
-                model.addAttribute("practica", p);
-                model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(p));
-            });
+            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
+            model.addAttribute("practicas", practicas);
         });
         return "tutorempresa/horas";
     }
 
-    // Marca un registro de horas como validado
-    @GetMapping("/horas/validar/{id}")
-    public String validarHoras(@PathVariable Integer id) {
-        seguimientoServicio.validar(id);
-        return "redirect:/tutorempresa/horas";
+    // Muestra el detalle de horas de una práctica concreta
+    @GetMapping("/horas/{id}")
+    public String detallehoras(@PathVariable Integer id, HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        practicaRepositorio.findById(id).ifPresent(p -> {
+            model.addAttribute("practica", p);
+            model.addAttribute("seguimientos", seguimientoServicio.listarPorPractica(p));
+        });
+        return "tutorempresa/detallehoras";
     }
 
-    // Muestra las evaluaciones y el formulario para añadir una nueva
+    // Marca un registro de horas como validado
+    @GetMapping("/horas/validar/{id}")
+    public String validarHoras(@PathVariable Integer id,
+                               @RequestParam Integer practicaId) {
+        seguimientoServicio.validar(id);
+        return "redirect:/tutorempresa/horas/" + practicaId;
+    }
+
+    // Muestra todas las prácticas para evaluar
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         model.addAttribute("usuario", session.getAttribute("usuario"));
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
-            getPracticaActiva(t).ifPresent(p -> {
-                model.addAttribute("practica", p);
-                model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(p));
-            });
+            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
+            model.addAttribute("practicas", practicas);
         });
         model.addAttribute("nuevaEvaluacion", new Evaluacion());
         return "tutorempresa/evaluaciones";
+    }
+
+    // Muestra el detalle de evaluaciones de una práctica concreta
+    @GetMapping("/evaluaciones/{id}")
+    public String detalleEvaluaciones(@PathVariable Integer id, HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        model.addAttribute("usuario", session.getAttribute("usuario"));
+        practicaRepositorio.findById(id).ifPresent(p -> {
+            model.addAttribute("practica", p);
+            model.addAttribute("evaluaciones", evaluacionServicio.listarPorPractica(p));
+        });
+        model.addAttribute("nuevaEvaluacion", new Evaluacion());
+        return "tutorempresa/detalleevaluaciones";
     }
 
     // Guarda una evaluación nueva del alumno
@@ -99,22 +109,32 @@ public class TutorEmpresaControlador {
         practicaRepositorio.findById(practicaId).ifPresent(evaluacion::setPractica);
         tutorRepositorio.findById(tutorId).ifPresent(evaluacion::setTutor);
         evaluacionServicio.guardar(evaluacion);
-        return "redirect:/tutorempresa/evaluaciones";
+        return "redirect:/tutorempresa/evaluaciones/" + practicaId;
     }
 
-    // Muestra los documentos subidos por el tutor de empresa
+    // Muestra todas las prácticas para gestionar documentos
     @GetMapping("/documentos")
     public String verDocumentos(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         model.addAttribute("usuario", usuario);
         tutorRepositorio.findById(usuario.getId()).ifPresent(t -> {
-            getPracticaActiva(t).ifPresent(p -> {
-                model.addAttribute("practica", p);
-                model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
-            });
+            List<Practica> practicas = practicaRepositorio.findByTutorEmpresa(t);
+            model.addAttribute("practicas", practicas);
         });
         return "tutorempresa/documentos";
+    }
+
+    // Muestra el detalle de documentos de una práctica concreta
+    @GetMapping("/documentos/{id}")
+    public String detalleDocumentos(@PathVariable Integer id, HttpSession session, Model model) {
+        if (session.getAttribute("usuario") == null) return "redirect:/login";
+        model.addAttribute("usuario", session.getAttribute("usuario"));
+        practicaRepositorio.findById(id).ifPresent(p -> {
+            model.addAttribute("practica", p);
+            model.addAttribute("documentos", documentoRepositorio.findByPractica(p));
+        });
+        return "tutorempresa/detalledocumentos";
     }
 
     // Guarda un documento subido por el tutor de empresa
@@ -144,6 +164,6 @@ public class TutorEmpresaControlador {
                 }
             }
         });
-        return "redirect:/tutorempresa/documentos";
+        return "redirect:/tutorempresa/documentos/" + practicaId;
     }
 }

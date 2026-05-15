@@ -12,77 +12,47 @@
     <div>
         <a th:href="@{/tutorcentro/panel}">Panel</a>
         <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
-        <a th:href="@{/tutorcentro/informe}">Generar Informe</a>
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </nav>
 <div class="contenido">
     <h1 class="panel-titulo">Supervisar Prácticas</h1>
 
-    <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
+    <p th:if="${practicas == null or #lists.isEmpty(practicas)}" class="bienvenida">
+        No tienes ninguna práctica asignada.
+    </p>
 
-    <div th:if="${practica != null}">
-        <h2 class="panel-titulo" style="font-size:18px; margin-bottom:15px;">
-            Alumno: <span th:text="${practica.alumno.nombre}"></span> —
-            Empresa: <span th:text="${practica.empresa.nombre}"></span>
-        </h2>
-
-        <h3 style="margin-bottom:10px; color:#555;">Seguimiento de horas</h3>
-        <table th:if="${seguimientos != null and !#lists.isEmpty(seguimientos)}">
-            <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Horas</th>
-                <th>Descripción</th>
-                <th>Validado</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="s : ${seguimientos}">
-                <td th:text="${s.fecha}"></td>
-                <td th:text="${s.horas}"></td>
-                <td th:text="${s.descripcion}"></td>
-                <td th:text="${s.validado != null and s.validado ? 'Sí' : 'No'}"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p th:if="${seguimientos == null or #lists.isEmpty(seguimientos)}" class="bienvenida">
-            No hay horas registradas aún.
-        </p>
-
-        <h3 style="margin-top:30px; margin-bottom:10px; color:#555;">Evaluaciones</h3>
-        <table th:if="${evaluaciones != null and !#lists.isEmpty(evaluaciones)}">
-            <thead>
-            <tr>
-                <th>Tutor</th>
-                <th>Nota</th>
-                <th>Comentarios</th>
-                <th>Validada</th>
-                <th>Acción</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="e : ${evaluaciones}">
-                <td th:text="${e.tutor.nombre}"></td>
-                <td th:text="${e.nota}"></td>
-                <td th:text="${e.comentarios}"></td>
-                <td th:text="${e.validada != null and e.validada ? 'Sí' : 'No'}"></td>
-                <td>
-                    <a th:if="${e.validada == null or !e.validada}"
-                       th:href="@{/tutorcentro/evaluaciones/validar/{id}(id=${e.id})}"
-                       class="btn-panel btn-verde"
-                       style="padding:6px 12px; font-size:12px;">
-                        Validar
-                    </a>
-                    <span th:if="${e.validada != null and e.validada}" style="color:#4CAF50; font-weight:bold;">Validada</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <p th:if="${evaluaciones == null or #lists.isEmpty(evaluaciones)}" class="bienvenida">
-            No hay evaluaciones registradas.
-        </p>
-    </div>
+    <table th:if="${practicas != null and !#lists.isEmpty(practicas)}">
+        <thead>
+        <tr>
+            <th>Alumno</th>
+            <th>Empresa</th>
+            <th>Fecha inicio</th>
+            <th>Fecha fin</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${practicas}">
+            <td th:text="${p.alumno.nombre}"></td>
+            <td th:text="${p.empresa.nombre}"></td>
+            <td th:text="${p.fechaInicio}"></td>
+            <td th:text="${p.fechaFin}"></td>
+            <td th:text="${p.estado}"></td>
+            <td>
+                <a th:href="@{/tutorcentro/practicas/{id}(id=${p.id})}"
+                   class="btn-panel" style="padding:6px 12px; font-size:12px;">
+                    Ver detalle
+                </a>
+                <a th:href="@{/tutorcentro/informe/{id}(id=${p.id})}"
+                   class="btn-panel btn-verde" style="padding:6px 12px; font-size:12px; margin-left:5px;">
+                    Informe
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

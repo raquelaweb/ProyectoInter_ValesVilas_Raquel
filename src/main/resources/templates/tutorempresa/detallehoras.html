@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <title>Validar Horas</title>
+</head>
+<body>
+<nav>
+    <span class="marca">Gestión de Prácticas</span>
+    <div>
+        <a th:href="@{/tutorempresa/panel}">Panel</a>
+        <a th:href="@{/tutorempresa/horas}">Validar Horas</a>
+        <a th:href="@{/tutorempresa/evaluaciones}">Evaluar Alumno</a>
+        <a th:href="@{/tutorempresa/documentos}">Documentos</a>
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</nav>
+<div class="contenido">
+    <h1 class="panel-titulo">Horas de <span th:text="${practica.alumno.nombre}"></span></h1>
+
+    <div style="margin-bottom:20px;">
+        <a th:href="@{/tutorempresa/horas}" class="btn-panel" style="padding:8px 16px;">Volver</a>
+    </div>
+
+    <p th:if="${seguimientos == null or #lists.isEmpty(seguimientos)}" class="bienvenida">
+        No hay horas registradas para validar.
+    </p>
+
+    <table th:if="${seguimientos != null and !#lists.isEmpty(seguimientos)}">
+        <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Horas</th>
+            <th>Descripción</th>
+            <th>Validado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${seguimientos}">
+            <td th:text="${s.fecha}"></td>
+            <td th:text="${s.horas}"></td>
+            <td th:text="${s.descripcion}"></td>
+            <td th:text="${s.validado != null and s.validado ? 'Sí' : 'No'}"></td>
+            <td>
+                <a th:if="${s.validado == null or !s.validado}"
+                   th:href="@{/tutorempresa/horas/validar/{id}(id=${s.id},practicaId=${practica.id})}"
+                   class="btn-panel btn-verde" style="padding:6px 12px; font-size:12px;">Validar</a>
+                <span th:if="${s.validado != null and s.validado}" style="color:#4CAF50; font-weight:bold;">Validado</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

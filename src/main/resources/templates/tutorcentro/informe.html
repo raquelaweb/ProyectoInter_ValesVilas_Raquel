@@ -12,7 +12,6 @@
     <div>
         <a th:href="@{/tutorcentro/panel}">Panel</a>
         <a th:href="@{/tutorcentro/practicas}">Supervisar Prácticas</a>
-        <a th:href="@{/tutorcentro/informe}">Generar Informe</a>
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </nav>
@@ -22,6 +21,11 @@
     <p th:if="${practica == null}" class="bienvenida">No tienes ninguna práctica asignada.</p>
 
     <div th:if="${practica != null}">
+
+        <div style="margin-bottom:20px;">
+            <a th:href="@{/tutorcentro/practicas}" class="btn-panel"
+               style="padding:8px 16px;">Volver</a>
+        </div>
 
         <div class="formulario">
             <h3 style="color:#1976D2; margin-bottom:15px;">Datos generales</h3>
