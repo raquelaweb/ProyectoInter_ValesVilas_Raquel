@@ -110,27 +110,27 @@ public class AlumnoControlador {
                                    HttpSession session) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
         Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (archivo == null || archivo.isEmpty()) return "redirect:/alumno/documentos";
+
+        String nombreFinal = archivo.getOriginalFilename();
+        try {
+            File dir = new File(UPLOAD_DIR);
+            if (!dir.exists()) dir.mkdirs();
+            archivo.transferTo(new File(UPLOAD_DIR + UUID.randomUUID() + "_" + nombreFinal));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         practicaServicio.buscarPorId(practicaId).ifPresent(p -> {
-            if (archivo != null && !archivo.isEmpty()) {
-                String nombreArchivo = archivo.getOriginalFilename();
-                try {
-                    File dir = new File(UPLOAD_DIR);
-                    if (!dir.exists()) dir.mkdirs();
-                    String nombreUnico = UUID.randomUUID() + "_" + nombreArchivo;
-                    archivo.transferTo(new File(UPLOAD_DIR + nombreUnico));
-                    nombreArchivo = nombreUnico;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Documento doc = new Documento();
-                doc.setPractica(p);
-                doc.setTipo(tipo);
-                doc.setRuta(nombreArchivo);
-                doc.setFechaSubida(java.time.LocalDate.now());
-                doc.setSubidoPor(usuario);
-                documentoRepositorio.save(doc);
-            }
+            Documento doc = new Documento();
+            doc.setPractica(p);
+            doc.setTipo(tipo);
+            doc.setRuta(nombreFinal);
+            doc.setFechaSubida(java.time.LocalDate.now());
+            doc.setSubidoPor(usuario);
+            documentoRepositorio.save(doc);
         });
+
         return "redirect:/alumno/documentos";
     }
 }
