@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-// Controlador que gestiona las funcionalidades del tutor de empresa
 @Controller
 @RequestMapping("/tutorempresa")
 public class TutorEmpresaControlador {
@@ -35,7 +34,6 @@ public class TutorEmpresaControlador {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    // Muestra el panel principal del tutor de empresa
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -43,7 +41,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/panel";
     }
 
-    // Muestra todas las prácticas asignadas al tutor de empresa
     @GetMapping("/horas")
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -55,7 +52,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/horas";
     }
 
-    // Muestra el detalle de horas de una práctica concreta
     @GetMapping("/horas/{id}")
     public String detallehoras(@PathVariable Integer id, HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -66,7 +62,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/detallehoras";
     }
 
-    // Marca un registro de horas como validado
     @GetMapping("/horas/validar/{id}")
     public String validarHoras(@PathVariable Integer id,
                                @RequestParam Integer practicaId) {
@@ -74,7 +69,6 @@ public class TutorEmpresaControlador {
         return "redirect:/tutorempresa/horas/" + practicaId;
     }
 
-    // Muestra todas las prácticas para evaluar
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -88,7 +82,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/evaluaciones";
     }
 
-    // Muestra el detalle de evaluaciones de una práctica concreta
     @GetMapping("/evaluaciones/{id}")
     public String detalleEvaluaciones(@PathVariable Integer id, HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -101,7 +94,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/detalleevaluaciones";
     }
 
-    // Guarda una evaluación nueva del alumno
     @PostMapping("/evaluaciones/guardar")
     public String guardarEvaluacion(@ModelAttribute Evaluacion evaluacion,
                                     @RequestParam Integer practicaId,
@@ -112,7 +104,6 @@ public class TutorEmpresaControlador {
         return "redirect:/tutorempresa/evaluaciones/" + practicaId;
     }
 
-    // Muestra todas las prácticas para gestionar documentos
     @GetMapping("/documentos")
     public String verDocumentos(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -125,7 +116,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/documentos";
     }
 
-    // Muestra el detalle de documentos de una práctica concreta
     @GetMapping("/documentos/{id}")
     public String detalleDocumentos(@PathVariable Integer id, HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -137,7 +127,6 @@ public class TutorEmpresaControlador {
         return "tutorempresa/detalledocumentos";
     }
 
-    // Guarda un documento subido por el tutor de empresa
     @PostMapping("/documentos/guardar")
     public String guardarDocumento(@RequestParam String tipo,
                                    @RequestParam MultipartFile archivo,
@@ -147,21 +136,23 @@ public class TutorEmpresaControlador {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         practicaRepositorio.findById(practicaId).ifPresent(p -> {
             if (archivo != null && !archivo.isEmpty()) {
+                String nombreArchivo = archivo.getOriginalFilename();
                 try {
                     File dir = new File(UPLOAD_DIR);
                     if (!dir.exists()) dir.mkdirs();
-                    String nombreUnico = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
+                    String nombreUnico = UUID.randomUUID() + "_" + nombreArchivo;
                     archivo.transferTo(new File(UPLOAD_DIR + nombreUnico));
-                    Documento doc = new Documento();
-                    doc.setPractica(p);
-                    doc.setTipo(tipo);
-                    doc.setRuta(nombreUnico);
-                    doc.setFechaSubida(java.time.LocalDate.now());
-                    doc.setSubidoPor(usuario);
-                    documentoRepositorio.save(doc);
+                    nombreArchivo = nombreUnico;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                Documento doc = new Documento();
+                doc.setPractica(p);
+                doc.setTipo(tipo);
+                doc.setRuta(nombreArchivo);
+                doc.setFechaSubida(java.time.LocalDate.now());
+                doc.setSubidoPor(usuario);
+                documentoRepositorio.save(doc);
             }
         });
         return "redirect:/tutorempresa/documentos/" + practicaId;

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-// Controlador que gestiona las funcionalidades del alumno
 @Controller
 @RequestMapping("/alumno")
 public class AlumnoControlador {
@@ -36,7 +35,6 @@ public class AlumnoControlador {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    // Devuelve la práctica activa del alumno, o la primera si no hay ninguna activa
     private Optional<Practica> getPracticaActiva(Alumno alumno) {
         List<Practica> practicas = practicaServicio.buscarPorAlumno(alumno);
         return practicas.stream()
@@ -45,7 +43,6 @@ public class AlumnoControlador {
                 .or(() -> practicas.stream().findFirst());
     }
 
-    // Muestra el panel principal del alumno
     @GetMapping("/panel")
     public String panel(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -53,7 +50,6 @@ public class AlumnoControlador {
         return "alumno/panel";
     }
 
-    // Muestra las horas registradas y el formulario para añadir nuevas
     @GetMapping("/horas")
     public String verHoras(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -68,7 +64,6 @@ public class AlumnoControlador {
         return "alumno/horas";
     }
 
-    // Guarda un nuevo registro de horas
     @PostMapping("/horas/guardar")
     public String guardarHoras(@ModelAttribute Seguimiento seguimiento,
                                @RequestParam Integer practicaId,
@@ -82,7 +77,6 @@ public class AlumnoControlador {
         return "redirect:/alumno/horas";
     }
 
-    // Muestra las evaluaciones recibidas por el alumno
     @GetMapping("/evaluaciones")
     public String verEvaluaciones(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -95,7 +89,6 @@ public class AlumnoControlador {
         return "alumno/evaluaciones";
     }
 
-    // Muestra los documentos subidos por el alumno
     @GetMapping("/documentos")
     public String verDocumentos(HttpSession session, Model model) {
         if (session.getAttribute("usuario") == null) return "redirect:/login";
@@ -110,7 +103,6 @@ public class AlumnoControlador {
         return "alumno/documentos";
     }
 
-    // Guarda un documento subido por el alumno
     @PostMapping("/documentos/guardar")
     public String guardarDocumento(@RequestParam String tipo,
                                    @RequestParam MultipartFile archivo,
@@ -120,21 +112,23 @@ public class AlumnoControlador {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         practicaServicio.buscarPorId(practicaId).ifPresent(p -> {
             if (archivo != null && !archivo.isEmpty()) {
+                String nombreArchivo = archivo.getOriginalFilename();
                 try {
                     File dir = new File(UPLOAD_DIR);
                     if (!dir.exists()) dir.mkdirs();
-                    String nombreUnico = UUID.randomUUID() + "_" + archivo.getOriginalFilename();
+                    String nombreUnico = UUID.randomUUID() + "_" + nombreArchivo;
                     archivo.transferTo(new File(UPLOAD_DIR + nombreUnico));
-                    Documento doc = new Documento();
-                    doc.setPractica(p);
-                    doc.setTipo(tipo);
-                    doc.setRuta(nombreUnico);
-                    doc.setFechaSubida(java.time.LocalDate.now());
-                    doc.setSubidoPor(usuario);
-                    documentoRepositorio.save(doc);
+                    nombreArchivo = nombreUnico;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                Documento doc = new Documento();
+                doc.setPractica(p);
+                doc.setTipo(tipo);
+                doc.setRuta(nombreArchivo);
+                doc.setFechaSubida(java.time.LocalDate.now());
+                doc.setSubidoPor(usuario);
+                documentoRepositorio.save(doc);
             }
         });
         return "redirect:/alumno/documentos";
