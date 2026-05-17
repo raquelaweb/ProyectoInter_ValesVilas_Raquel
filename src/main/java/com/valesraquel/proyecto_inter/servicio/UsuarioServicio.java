@@ -6,6 +6,7 @@ import com.valesraquel.proyecto_inter.modelo.Alumno;
 import com.valesraquel.proyecto_inter.modelo.Tutor;
 import com.valesraquel.proyecto_inter.modelo.Practica;
 import com.valesraquel.proyecto_inter.repositorio.AlumnoRepositorio;
+import com.valesraquel.proyecto_inter.repositorio.DocumentoRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.PracticaRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.UsuarioRepositorio;
 import com.valesraquel.proyecto_inter.repositorio.EvaluacionRepositorio;
@@ -22,37 +23,22 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
-// Servicio principal de usuarios, también implementa UserDetailsService para Spring Security
 @Service
 public class UsuarioServicio implements UserDetailsService {
 
-    @Autowired
-    private UsuarioRepositorio repositorio;
+    @Autowired private UsuarioRepositorio repositorio;
+    @Autowired private PracticaRepositorio practicaRepositorio;
+    @Autowired private AlumnoRepositorio alumnoRepositorio;
+    @Autowired private TutorRepositorio tutorRepositorio;
+    @Autowired private EvaluacionRepositorio evaluacionRepositorio;
+    @Autowired private SeguimientoRepositorio seguimientoRepositorio;
+    @Autowired private DocumentoRepositorio documentoRepositorio;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private PracticaRepositorio practicaRepositorio;
-
-    @Autowired
-    private AlumnoRepositorio alumnoRepositorio;
-
-    @Autowired
-    private TutorRepositorio tutorRepositorio;
-
-    @Autowired
-    private EvaluacionRepositorio evaluacionRepositorio;
-
-    @Autowired
-    private SeguimientoRepositorio seguimientoRepositorio;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-    // Spring Security usa este método para cargar el usuario al hacer login
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Usuario usuario = repositorio.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
-
         return new User(
                 usuario.getEmail(),
                 usuario.getPassword(),
@@ -60,23 +46,18 @@ public class UsuarioServicio implements UserDetailsService {
         );
     }
 
-    // Busca un usuario por su email
     public Optional<Usuario> buscarPorEmail(String email) {
         return repositorio.findByEmail(email);
     }
 
-    // Devuelve todos los usuarios
     public List<Usuario> listarTodos() {
         return repositorio.findAll();
     }
 
-    // Busca un usuario por su id
     public Optional<Usuario> buscarPorId(Integer id) {
         return repositorio.findById(id);
     }
 
-    // Guarda un usuario y crea su registro específico según el rol usando SQL directo
-    // para evitar conflictos de caché con Hibernate
     @Transactional
     public Usuario guardar(Usuario usuario) {
         Usuario guardado = repositorio.save(usuario);
@@ -104,6 +85,7 @@ public class UsuarioServicio implements UserDetailsService {
         alumnoRepositorio.findById(id).ifPresent(alumno -> {
             List<Practica> practicas = practicaRepositorio.findByAlumno(alumno);
             practicas.forEach(p -> {
+                documentoRepositorio.deleteAll(documentoRepositorio.findByPractica(p));
                 evaluacionRepositorio.deleteAll(evaluacionRepositorio.findByPractica(p));
                 seguimientoRepositorio.deleteAll(seguimientoRepositorio.findByPractica(p));
             });
